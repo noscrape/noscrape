@@ -21,10 +21,10 @@ jobs:
           goarch: amd64
           goamd64: v4
 
-      - name: linux-arm
+      - name: darwin-arm
         uses: wangyoucao577/go-release-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: linux
+          goos: darwin
           goarch: arm64
           goarm: 7
