@@ -7,7 +7,7 @@ import "C"
 
 import (
 	"encoding/json"
-	"github.com/schoenbergerb/noscrape/noscrape"
+	"github.com/noscrape/noscrape/noscrape"
 	"seehuhn.de/go/sfnt"
 )
 
