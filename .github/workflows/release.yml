@@ -9,10 +9,6 @@ permissions:
 jobs:
   release:
     name: release
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin]
-        goarch: [amd64, arm64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
