@@ -1,9 +1,7 @@
 name: Build Shared Library
 
 on:
-  push:
-    branches:
-      - main
+  release: [created]
 
 jobs:
   build:
