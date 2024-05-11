@@ -1,17 +1,24 @@
 package main
 
-import (
-	"C"
-	"encoding/json"
-	"seehuhn.de/go/sfnt"
+/*
+#include <stdlib.h>
+*/
+import "C"
 
+import (
+	"encoding/json"
 	"github.com/schoenbergerb/noscrape/noscrape"
+	"seehuhn.de/go/sfnt"
 )
 
 //export noscrape_obfuscate
-func noscrape_obfuscate(s *C.char) *C.char {
-	var m []noscrape.RuneMap
-	r := noscrape.Obfuscate(C.GoString(s), m)
+func noscrape_obfuscate(s *C.char, m *C.char) *C.char {
+	var mapping []noscrape.RuneMap
+	if m != nil {
+		json.Unmarshal([]byte(C.GoString(m)), &mapping)
+	}
+
+	r := noscrape.Obfuscate(C.GoString(s), mapping)
 	jsonData, err := json.Marshal(r)
 
 	if err != nil {
@@ -30,13 +37,17 @@ func noscrape_render(f *C.char, m *C.char) *C.char {
 		panic(err)
 	}
 
-	var res noscrape.ObfuscationResult
-	err = json.Unmarshal([]byte(C.GoString(m)), &res)
-	if err != nil {
-		panic(err)
+	var mapping []noscrape.RuneMap
+	if m != nil {
+		err = json.Unmarshal([]byte(C.GoString(m)), &mapping)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	return C.CString(noscrape.Render(*font, res.Map))
+	result := C.CString(noscrape.Render(*font, mapping))
+
+	return result
 }
 
 func main() {

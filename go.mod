@@ -1,4 +1,4 @@
-module github.com/schoenbergerb/noscrape
+module github.com/noscrape/noscrape
 
 go 1.22
 
