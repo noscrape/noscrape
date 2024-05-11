@@ -1,35 +1,40 @@
-on:
-  release:
-    types: [created]
+name: Build Shared Library
 
-permissions:
-  contents: write
-  packages: write
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  release:
-    name: release
+  build:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - uses: actions/setup-go@v5
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.22.0'
+          go-version: 1.22
 
+      - name: Build Shared Library for Linux
+        run: GOOS=linux GOARCH=amd64 go build -o noscrape_linux_amd64 -buildmode=c-shared .
 
-      - name: linux-amd64
-        uses: wangyoucao577/go-release-action@v1
+      - name: Build Shared Library for Windows
+        run: GOOS=windows GOARCH=amd64 go build -o noscrape_windows_amd64.exe -buildmode=c-shared .
+
+      - name: Build Shared Library for macOS
+        run: GOOS=darwin GOARCH=amd64 go build -o noscrape_darwin_amd64 -buildmode=c-shared .
+
+      - name: Test
+        run: go test ./...
+
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: linux
-          goarch: amd64
-          goamd64: v4
-
-      - name: darwin-arm
-        uses: wangyoucao577/go-release-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: darwin
-          goarch: arm64
-          goarm: 7
+          name: shared-library
+          path: |
+            noscrape_linux_amd64
+            noscrape_windows_amd64.exe
+            noscrape_darwin_amd64
