@@ -1,5 +1,3 @@
-# .github/workflows/release.yaml
-
 on:
   release:
     types: [created]
@@ -14,7 +12,7 @@ jobs:
     strategy:
       matrix:
         arch: [ arm64, amd64 ]
-        os: [ linux-latest, macos-latest, windows-latest ]
+        os: [ linux-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
