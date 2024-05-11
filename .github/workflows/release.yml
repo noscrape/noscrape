@@ -1,7 +1,8 @@
 name: Build Shared Library
 
 on:
-  release: [created]
+  release:
+    types: [created]
 
 jobs:
   build:
