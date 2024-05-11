@@ -15,17 +15,20 @@ func TestHelloName(t *testing.T) {
 	j, _ := json.Marshal(s)
 
 	fmt.Printf("%s\n", j)
-	font, err := sfnt.ReadFile("../example/ubuntu.ttf")
+	font, err := sfnt.ReadFile("./example/example.ttf")
 	if err != nil {
-		panic(err)
+		t.Fatalf("could not read font: %v", err)
 	}
 
 	var res noscrape.ObfuscationResult
 	err = json.Unmarshal(j, &res)
 	if err != nil {
-		panic(err)
+		t.Fatalf("could not unmarshal json: %v", err)
 	}
 
-	r := noscrape.Render(*font, res.Map)
-	println(r)
+	r, e := noscrape.Render(*font, res.Map)
+	if e != nil || r == "" {
+		t.Fatalf("could not render")
+	}
+
 }

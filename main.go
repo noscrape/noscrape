@@ -45,9 +45,12 @@ func noscrape_render(f *C.char, m *C.char) *C.char {
 		}
 	}
 
-	result := C.CString(noscrape.Render(*font, mapping))
+	result, err := noscrape.Render(*font, mapping)
+	if err != nil {
+		panic(err)
+	}
 
-	return result
+	return C.CString(result)
 }
 
 func main() {

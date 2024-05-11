@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func Render(font sfnt.Font, translation []RuneMap) string {
+func Render(font sfnt.Font, translation []RuneMap) (string, error) {
 
 	notdefGlyph := cff.NewGlyph(".notdef", 1000) // Adjust the width as needed
 	notdefGlyph.MoveTo(100, 100)
@@ -85,12 +85,10 @@ func Render(font sfnt.Font, translation []RuneMap) string {
 	newFont.InstallCMap(cmapNew)
 
 	buf := new(bytes.Buffer)
-	_, err1 := newFont.Write(buf)
-	if err1 != nil {
-		panic(err1)
+	_, err := newFont.Write(buf)
+	if err != nil {
+		return "", fmt.Errorf("could not write tmp file: %v", err)
 	}
 
-	fmt.Println()
-
-	return b64.StdEncoding.EncodeToString(buf.Bytes())
+	return b64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
