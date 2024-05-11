@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/schoenbergerb/noscrape/noscrape"
+	"github.com/noscrape/noscrape/noscrape"
 	"seehuhn.de/go/sfnt"
 	"testing"
 )
