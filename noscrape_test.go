@@ -15,7 +15,7 @@ func TestHelloName(t *testing.T) {
 	j, _ := json.Marshal(s)
 
 	fmt.Printf("%s\n", j)
-	font, err := sfnt.ReadFile("/Users/bernhards/GolandProjects/noscrape/example/ubuntu.ttf")
+	font, err := sfnt.ReadFile("../example/ubuntu.ttf")
 	if err != nil {
 		panic(err)
 	}
