@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func Render(font sfnt.Font, translation []RuneMap) (string, error) {
+func Render(font sfnt.Font, translation map[string]int32) (string, error) {
 
 	notdefGlyph := cff.NewGlyph(".notdef", 1000) // Adjust the width as needed
 	notdefGlyph.MoveTo(100, 100)
@@ -33,12 +33,12 @@ func Render(font sfnt.Font, translation []RuneMap) (string, error) {
 
 	glyphs = append(glyphs, notdefGlyph)
 
-	for _, m := range translation {
-		fmt.Printf("%v ", m.OriginalRune)
-		b = blueValues(font, m.OriginalRune, b)
-		cmapNew[uint32(m.ObfuscationTarget)] = glyph.ID(len(glyphs))
+	for o, target := range translation {
+		origin := []rune(o)[0]
+		b = blueValues(font, origin, b)
+		cmapNew[uint32(target)] = glyph.ID(len(glyphs))
 		encoding = append(encoding, glyph.ID(len(glyphs)))
-		origGlyf := fetchOriginalGlyph(font, m.OriginalRune)
+		origGlyf := fetchOriginalGlyph(font, origin)
 		glyphs = append(glyphs, origGlyf)
 	}
 

@@ -1,58 +1,49 @@
 package main
 
-/*
-#include <stdlib.h>
-*/
 import "C"
-
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/noscrape/noscrape/noscrape"
+	"os"
 	"seehuhn.de/go/sfnt"
 )
 
-//export noscrape_obfuscate
-func noscrape_obfuscate(s *C.char, m *C.char) *C.char {
-	var mapping []noscrape.RuneMap
-	if m != nil {
-		json.Unmarshal([]byte(C.GoString(m)), &mapping)
-	}
-
-	r := noscrape.Obfuscate(C.GoString(s), mapping)
-	jsonData, err := json.Marshal(r)
-
-	if err != nil {
-		panic(err)
-	}
-
-	response := string(jsonData)
-
-	return C.CString(response)
-}
-
-//export noscrape_render
-func noscrape_render(f *C.char, m *C.char) *C.char {
-	font, err := sfnt.ReadFile(C.GoString(f))
-	if err != nil {
-		panic(err)
-	}
-
-	var mapping []noscrape.RuneMap
-	if m != nil {
-		err = json.Unmarshal([]byte(C.GoString(m)), &mapping)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	result, err := noscrape.Render(*font, mapping)
-	if err != nil {
-		panic(err)
-	}
-
-	return C.CString(result)
+type Input struct {
+	Font  string           `json:"font"`
+	Trans map[string]int32 `json:"translation"`
 }
 
 func main() {
-	// This is needed to build the shared library
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: ./noscrape '<JSON string>'")
+		os.Exit(1)
+	}
+	var input Input
+
+	// Parse the JSON string into the Input struct
+	err := json.Unmarshal([]byte(os.Args[1]), &input)
+	if err != nil {
+		_ = fmt.Errorf("Error decoding JSON: %v\n", err)
+		os.Exit(1)
+	}
+
+	font, err := sfnt.ReadFile(input.Font)
+	if err != nil {
+		_ = fmt.Errorf("Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	result, err := noscrape.Render(*font, input.Trans)
+	if err != nil {
+		_ = fmt.Errorf("Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	_, err = fmt.Print(result)
+	if err != nil {
+		_ = fmt.Errorf("Error: %v\n", err)
+		os.Exit(1)
+	}
+	os.Exit(0)
 }

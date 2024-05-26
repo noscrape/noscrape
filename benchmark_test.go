@@ -17,9 +17,7 @@ func BenchmarkObfuscation(b *testing.B) {
 
 func BenchmarkRendering(b *testing.B) {
 
-	var m []noscrape.RuneMap
-
-	mt := noscrape.Obfuscate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", m)
+	var m map[string]int32
 
 	font, err := sfnt.ReadFile("./example/example.ttf")
 	if err != nil {
@@ -28,6 +26,6 @@ func BenchmarkRendering(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		noscrape.Render(*font, mt.Map)
+		noscrape.Render(*font, m)
 	}
 }
