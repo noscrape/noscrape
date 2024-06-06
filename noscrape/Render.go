@@ -2,7 +2,6 @@ package noscrape
 
 import (
 	"bytes"
-	b64 "encoding/base64"
 	"fmt"
 	"seehuhn.de/go/postscript/funit"
 	"seehuhn.de/go/postscript/type1"
@@ -13,7 +12,7 @@ import (
 	"time"
 )
 
-func Render(font sfnt.Font, translation map[string]int32) (string, error) {
+func Render(font sfnt.Font, translation map[string]int32) (*bytes.Buffer, error) {
 
 	notdefGlyph := cff.NewGlyph(".notdef", 1000) // Adjust the width as needed
 	notdefGlyph.MoveTo(100, 100)
@@ -87,8 +86,9 @@ func Render(font sfnt.Font, translation map[string]int32) (string, error) {
 	buf := new(bytes.Buffer)
 	_, err := newFont.Write(buf)
 	if err != nil {
-		return "", fmt.Errorf("could not write tmp file: %v", err)
+
+		return nil, fmt.Errorf("could not write tmp file: %v", err)
 	}
 
-	return b64.StdEncoding.EncodeToString(buf.Bytes()), nil
+	return buf, nil
 }

@@ -21,7 +21,7 @@ func TestHelloName(t *testing.T) {
 	}
 
 	r, e := noscrape.Render(*font, m)
-	if e != nil || r == "" {
+	if e != nil || r.String() == "" {
 		t.Fatalf("could not render")
 	}
 

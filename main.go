@@ -2,6 +2,7 @@ package main
 
 import "C"
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/noscrape/noscrape/noscrape"
@@ -34,16 +35,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	result, err := noscrape.Render(*font, input.Trans)
+	buf, err := noscrape.Render(*font, input.Trans)
 	if err != nil {
 		_ = fmt.Errorf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	_, err = fmt.Print(result)
-	if err != nil {
-		_ = fmt.Errorf("Error: %v\n", err)
-		os.Exit(1)
-	}
+	b64 := base64.StdEncoding.EncodeToString(buf.Bytes())
+
+	fmt.Println(b64)
+
 	os.Exit(0)
 }

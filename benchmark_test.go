@@ -26,6 +26,6 @@ func BenchmarkRendering(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		noscrape.Render(*font, m)
+		_, _ = noscrape.Render(*font, m)
 	}
 }
