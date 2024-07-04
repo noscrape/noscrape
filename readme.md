@@ -26,7 +26,7 @@ sequenceDiagram
     activate Noscrape
     Noscrape -->> Wrapper: Encoded font data
     deactivate Noscrape
-    Wrapper -->> Client: Return Promise<Buffer>
+    Wrapper -->> Client: Return font
     deactivate Wrapper
 
 ```
