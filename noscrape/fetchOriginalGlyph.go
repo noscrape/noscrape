@@ -1,23 +1,30 @@
 package noscrape
 
 import (
+	"fmt"
 	"seehuhn.de/go/sfnt"
 	"seehuhn.de/go/sfnt/cff"
 	"seehuhn.de/go/sfnt/glyf"
 )
 
+// fetchOriginalGlyph retrieves the original glyph from the provided font based on the given rune.
+// It converts the TrueType glyph outline to a CFF glyph outline and returns the resulting CFF glyph.
 func fetchOriginalGlyph(font sfnt.Font, originalRune rune) *cff.Glyph {
+	// Get the best cmap table from the font
 	originalCmap, err := font.CMapTable.GetBest()
-
 	if err != nil {
 		panic("cmap not found")
 	}
 
+	// Lookup the glyph ID for the original rune
 	originId := originalCmap.Lookup(originalRune)
+	// Get the original outlines from the font
 	origOutlines := font.Outlines.(*glyf.Outlines)
 
+	// Create a new CFF glyph with the name and width of the original glyph
 	cffGlyph := cff.NewGlyph(font.GlyphName(originId), font.GlyphWidth(originId))
 
+	// Get the original glyph from the outlines
 	origGlyf := origOutlines.Glyphs[originId]
 
 	var g glyf.SimpleGlyph
@@ -30,8 +37,13 @@ func fetchOriginalGlyph(font sfnt.Font, originalRune rune) *cff.Glyph {
 		return cffGlyph
 	}
 
+	// Decode the glyph information
 	glyphInfo, err := g.Decode()
+	if err != nil {
+		panic(fmt.Sprintf("error decoding glyph: %v", err))
+	}
 
+	// Convert TrueType contours to CFF contours
 	for _, cc := range glyphInfo.Contours {
 		var extended glyf.Contour
 		var prev glyf.Point
@@ -58,6 +70,7 @@ func fetchOriginalGlyph(font sfnt.Font, originalRune rune) *cff.Glyph {
 			}
 		}
 
+		// Move to the starting point of the contour
 		cffGlyph.MoveTo(float64(extended[offs].X), float64(extended[offs].Y))
 
 		i := 0
@@ -71,12 +84,11 @@ func fetchOriginalGlyph(font sfnt.Font, originalRune rune) *cff.Glyph {
 				if i == n-1 {
 					break
 				}
+				// Draw a line to the next on-curve point
 				cffGlyph.LineTo(float64(extended[i1].X), float64(extended[i1].Y))
 				i++
 			} else {
-				// See the following link for converting truetype outlines
-				// to CFF outlines:
-				// https://pomax.github.io/bezierinfo/#reordering
+				// Convert TrueType curves to CFF curves
 				i2 := (i1 + 1) % n
 				cffGlyph.CurveTo(
 					float64(extended[i0].X)/3+float64(extended[i1].X)*2/3,
